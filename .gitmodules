@@ -1,0 +1,15 @@
+[submodule "udo-core"]
+	path = udo-core
+	url = git@github.com:nemoworks/udo-core.git
+[submodule "udo-api-rest"]
+	path = udo-api-rest
+	url = git@github.com:nemoworks/udo-api-rest.git
+[submodule "udo-api-graphql"]
+	path = udo-api-graphql
+	url = git@github.com:nemoworks/udo-api-graphql.git
+[submodule "udo-storage-jpa"]
+	path = udo-storage-jpa
+	url = git@github.com:nemoworks/udo-storage-jpa.git
+[submodule "udo-storage-elasticsearch"]
+	path = udo-storage-elasticsearch
+	url = git@github.com:nemoworks/udo-storage-elasticsearch.git
