@@ -13,3 +13,6 @@
 [submodule "udo-storage-elasticsearch"]
 	path = udo-storage-elasticsearch
 	url = git@github.com:nemoworks/udo-storage-elasticsearch.git
+[submodule "udo-messaging"]
+	path = udo-messaging
+	url = git@github.com:nemoworks/udo-messaging.git
