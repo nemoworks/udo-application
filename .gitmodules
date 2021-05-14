@@ -12,4 +12,4 @@
 	url = git@github.com:nemoworks/udo-storage-jpa.git
 [submodule "udo-storage-elasticsearch"]
 	path = udo-storage-elasticsearch
-	url = git@github.com:nemoworks/udo-storage-elasticsearch.git
+	url = git@github.com:TcPaulyue/udo-storage-elasticsearch.git
