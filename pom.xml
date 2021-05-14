@@ -23,6 +23,7 @@
 		<module>udo-api-graphql</module>
 		<module>udo-storage-jpa</module>
 		<module>udo-storage-elasticsearch</module>
+		<module>udo-messaging</module>
 	</modules>
 	<dependencies>
 		<dependency>
