@@ -24,6 +24,7 @@
 		<module>udo-storage-jpa</module>
 		<module>udo-storage-elasticsearch</module>
 		<module>udo-messaging</module>
+		<module>udo-poc</module>
 	</modules>
 	<dependencies>
 		<dependency>
