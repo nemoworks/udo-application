@@ -16,3 +16,6 @@
 [submodule "udo-messaging"]
 	path = udo-messaging
 	url = git@github.com:nemoworks/udo-messaging.git
+[submodule "udo-poc"]
+	path = udo-poc
+	url = git@github.com:nemoworks/udo-poc.git
