@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: udo-mosquitto
+  namespace: udo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: udo-mosquitto
+  template:
+    metadata:
+      labels:
+        app: udo-mosquitto
+    spec:
+      containers:
+      - name: mosquitto
+        image: eclipse-mosquitto:2.0.11
+        command: [ "/usr/sbin/mosquitto"]
+        args:
+          - "-c"
+          - "/mosquitto/config/mosquitto.conf"
+        resources:
+          limits:
+            memory: "2048Mi"
+            cpu: "1"
+        ports:
+        - containerPort: 1883
+        - containerPort: 1884
+        - containerPort: 9001
+        volumeMounts:
+          - name: mqtt-config
+            mountPath: /mosquitto/config/mosquitto.conf
+          - name: mqtt-data
+            mountPath: /mosquitto/data 
+          - name: mqtt-log
+            mountPath: /mosquitto/log
+          - name: mqtt-passwd
+            mountPath: /mosquitto/passwd
+      volumes:
+        - name: mqtt-config
+          hostPath:
+            path: /share/mosquitto-deploy/mosquitto/config/mosquitto.conf
+        - name: mqtt-data
+          hostPath:
+            path: /share/mosquitto-deploy/mosquitto/data
+        - name: mqtt-log
+          hostPath:
+            path: /share/mosquitto-deploy/mosquitto/log
+        - name: mqtt-passwd
+          hostPath:
+            path: /share/mosquitto-deploy/mosquitto/passwd
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: udo-mosquitto
+  namespace: udo
+spec:
+  selector:
+    app: udo-mosquitto
+  ports:
+  - port: 8888
+    targetPort: 1883
+    name: mqtt-port-tcp
+  - port: 8887
+    targetPort: 1884
+    name: mqtt-port-websocket
+  
+  type: NodePort
+
