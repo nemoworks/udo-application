@@ -1,0 +1,13 @@
+{
+  "type": "object",
+  "title": "room schema",
+  "properties": {
+    "Name": {
+      "type": "string"
+    },
+    "MiPro": {
+      "type": "link",
+      "linkTo": "Air_Purifier"
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "equalValues": [
+    {
+      "createdBy": "nemoworks"
+    }
+  ],
+  "largerThanValues": [
+    {
+      "createdOn": "0"
+    }
+  ],
+  "timeLargerValues": [
+    {
+      "clock": "08:00:00"
+    }
+  ],
+  "timeLessValues": [
+    {
+      "clock": "19:00:00"
+    }
+  ],
+  "distanceScopes": [
+    {
+      "scope": "10.1"
+    }
+  ]
+}

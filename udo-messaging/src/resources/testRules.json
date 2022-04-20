@@ -1,0 +1,28 @@
+{
+  "equalValues": [
+    {
+      "createdBy": "nemoworks"
+    }
+  ],
+  "largerThanValues": [
+    {
+      "createdOn": "6"
+    }
+  ],
+  "lessThanValues": [
+    {
+      "createdOn": "23"
+    }
+  ],
+  "timeLargerValues": [
+    {
+      "clock": "08:00:00"
+    }
+  ],
+  "timeLessValues": [
+    {
+      "clock": "19:00:00"
+    }
+  ]
+}
+

@@ -1,0 +1,18 @@
+{
+    "type": "object",
+    "title": "air_purifier",
+    "properties": {
+        "Name": {
+            "type": "string",
+            "description": "产品名称"
+        },
+        "Brand": {
+            "type": "string",
+            "description": "品牌"
+        },
+        "Version": {
+            "type": "string",
+            "description": "型号"
+        }
+    }
+}
