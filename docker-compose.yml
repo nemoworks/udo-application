@@ -1,0 +1,26 @@
+version: '3'
+services:
+  elasticsearch:
+    image:  docker.elastic.co/elasticsearch/elasticsearch:7.9.2
+    container_name: elasticsearch
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    expose:
+      - "9200"
+    restart: "always"
+    environment:
+        - "discovery.type=single-node"
+        - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+
+  udo:
+    image: udo:latest
+    container_name: udo
+    ports:
+      - "8080:8080"
+    expose:
+      - "8080"
+    depends_on:
+      - elasticsearch
+    links:
+      - elasticsearch
