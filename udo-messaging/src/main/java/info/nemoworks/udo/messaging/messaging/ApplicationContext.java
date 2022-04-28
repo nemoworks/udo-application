@@ -19,11 +19,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
+
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.javatuples.Pair;
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 public class ApplicationContext {
 
     private String appId;
@@ -89,7 +92,7 @@ public class ApplicationContext {
         this.mqttPublisher
             .publish("topic/register",
                 payload.toString().getBytes());
-        System.out.println(("publish To Register========" + ":" + new String(
+        log.info(("publish To Register========" + ":" + new String(
             payload.toString().getBytes())));
         payload.addProperty("destination", "all");
         for (Pair<ApplicationContext, Set<String>> pair : ApplicationContextCluster
@@ -99,7 +102,7 @@ public class ApplicationContext {
                 this.mqttPublisher
                     .publish("topic/" + pair.getValue0().appId,
                         payload.toString().getBytes());
-                System.out.println(
+                log.info(
                     ("publish To Context " + pair.getValue0().appId + "========" + ":" + new String(
                         payload.toString().getBytes())));
             }
@@ -119,7 +122,7 @@ public class ApplicationContext {
         this.mqttPublisher
             .publish(getMqttTopic(appId),
                 payload.toString().getBytes());
-        System.out.println(("publish To Register========" + ":" + new String(
+        log.info(("publish To Register========" + ":" + new String(
             payload.toString().getBytes())));
     }
 
@@ -134,7 +137,7 @@ public class ApplicationContext {
                 if (udos.contains(udo.getId())) {
                     String topic = getMqttTopic(pair.getValue0().getAppId());
                     Thread thread = Thread.currentThread();
-                    System.out.println("thread=====" + thread.getId());
+                    log.info("thread=====" + thread.getId());
                     Gson gson = new Gson();
                     // HTTP广播
                     for (String id : udos) {
@@ -150,7 +153,7 @@ public class ApplicationContext {
                     try {
                         JsonObject content = (JsonObject) udo.getData();
                         content.addProperty("uri", udo.getUri().getUri());
-                        System.out.println(("publish========" + ":" + new String(
+                        log.info(("publish========" + ":" + new String(
                             content.toString().getBytes())));
                         JsonObject payload = new JsonObject();
                         payload.add("payload", content);
@@ -172,10 +175,10 @@ public class ApplicationContext {
 
     // 收消息
     public synchronized void subscribeMessage(String appId) throws MqttException {
-        System.out.println("Subscribing Topic: " + getMqttTopic(appId));
+        log.info("Subscribing Topic: " + getMqttTopic(appId));
         mqttSubscriber
             .subscribe(getMqttTopic(appId), (topic, payload) -> {
-                System.out.println("Again, Print Topic: " + topic);
+                log.info("Again, Print Topic: " + topic);
                 Gson gson = new Gson();
                 JsonObject data = gson
                     .fromJson(new String(payload.getPayload()), JsonObject.class);
@@ -184,7 +187,7 @@ public class ApplicationContext {
                 String destination = data.getAsJsonPrimitive("destination").getAsString();
                 // 收到一个消息来源不是后台的消息，表明是外部服务请求更新资源状态
                 if (source.equals("backend")) {
-                    System.out.println("Message Comes From Backend, Skip");
+                    log.info("Message Comes From Backend, Skip");
                     return;
                 }
                 ConcurrentHashMap<String, String> endpoints = mqttGateway.getEndpoints();
@@ -200,10 +203,10 @@ public class ApplicationContext {
                         }
                     }
                 );
-                System.out.println("Before Check Id...");
+                log.info("Before Check Id...");
                 String targetId = target.get();
                 String fromId = from.get();
-                System.out.println("After Check Id...");
+                log.info("After Check Id...");
                 if (this.filteringMessage(fromId, targetId, content)) {
                     mqttPublisher.publish(destination, content.toString().getBytes());
                 } else {
@@ -211,7 +214,7 @@ public class ApplicationContext {
                     Udo udo = udoService.getUdoById(targetId);
                     JsonObject contentFail = (JsonObject) udo.getData();
                     contentFail.addProperty("uri", udo.getUri().getUri());
-                    System.out.println(("Fail Check, Publish Formal Message===" + ":" + new String(
+                    log.info(("Fail Check, Publish Formal Message===" + ":" + new String(
                         contentFail.toString().getBytes())));
                     JsonObject payloadFail = new JsonObject();
                     payloadFail.add("payload", contentFail);
@@ -228,39 +231,39 @@ public class ApplicationContext {
 
     private boolean filteringMessage(String fromId, String targetId, JsonObject messageContent)
         throws JsonProcessingException {
-        System.out.println("In filtering Message...");
-        System.out.println("Target Id: " + targetId);
-        System.out.println("From Id: " + fromId);
+        log.info("In filtering Message...");
+        log.info("Target Id: " + targetId);
+        log.info("From Id: " + fromId);
         Udo targetUdo = udoService.getUdoById(targetId);
-        System.out.println("Middle Check");
+        log.info("Middle Check");
         Udo fromUdo = udoService.getUdoById(fromId);
         if (filterRuleMap.get(fromId) != null) {
             FilterRule filterRule = filterRuleMap.get(fromId);
             if (filterRule.filteringDistance(targetUdo, fromUdo)) {
-                System.out.println("Distance Check Between " + fromId + " And "
+                log.info("Distance Check Between " + fromId + " And "
                     + targetId + " Passed!");
             } else {
-                System.out.println("Distance Check Between " + fromId + " And "
+                log.info("Distance Check Between " + fromId + " And "
                     + targetId + " Failed!");
                 return false;
             }
         } else {
-            System.out.println("No Distance Filter Rule Found, Message Passed!");
+            log.info("No Distance Filter Rule Found, Message Passed!");
         }
         if (filterRuleMap.get(targetId) != null) {
             FilterRule filterRule = filterRuleMap.get(targetId);
             Udo testTemp = new Udo(messageContent);
             this.addDateSticker(testTemp);
             if (filterRule.filteringAll(testTemp)) {
-                System.out.println("Attributes Check On "
+                log.info("Attributes Check On "
                     + targetId + " Passed!");
             } else {
-                System.out.println("Attributes Check On "
+                log.info("Attributes Check On "
                     + targetId + " Failed!");
                 return false;
             }
         } else {
-            System.out.println("No Attributes Filter Rule Found, Message Passed!");
+            log.info("No Attributes Filter Rule Found, Message Passed!");
         }
         return true;
     }

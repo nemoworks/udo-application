@@ -19,9 +19,6 @@ public abstract class UdoGateway {
 
     @Autowired
     EventBus eventBus;
-
-//    private static final Logger logger = LoggerFactory.getLogger(UdoGateway.class);
-
     public enum UdoGatewayType {
         HTTP, MQTT
     }
