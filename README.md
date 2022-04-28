@@ -8,46 +8,7 @@ IOS端：https://github.com/nemoworks/udo-iosapp
 
 系统演示：https://www.bilibili.com/video/BV1yq4y1H7wx?share_source=copy_web
 
-##项目结构
-```
-.
-├── README.md
-├── pom.xml
-├── mosquitto-deploy              部署mqtt server
- ├── manifests.yaml
-│   └── mosquitto
-├── udo-api-graphql               graphql api生成udo管理接口
-|
-├── udo-api-rest                  restful api支持udo交互
-|
-├── udo-core                      udo模型定义
-|
-├── udo-messaging                 udo协同通讯模块
-|
-├── udo-poc                       udo验证实例
-|
-├── udo-storage-elasticsearch     udo elasticsearch存储支持
-|
-└── udo-storage-jpa               udo jpa存储支持
-
-```
-## 项目启动
-
-- 本地启动数据库镜像
-  ```
-    docker run -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:7.9.2
-  ```
-  
-- 运行mqtt server
-
-    ```
-     参考mosquitto-deploy目录
-    ```
-
-- 启动本项目
-    ```
-      mvn spring-boot:run
-    ```
+详情见[架构说明](docs/架构说明.md)和[部署说明](docs/部署说明.md)。
 
 ## 演示示例
-
+![](docs/images/UDO.png)
