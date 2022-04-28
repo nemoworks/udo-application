@@ -119,7 +119,6 @@ public class SchemaTree {
                         jsonObject = new Gson().toJsonTree(value1).getAsJsonObject();
                         String s = jsonObject.get("items").getAsJsonObject().get("typeName")
                             .getAsString();
-                        System.out.println(s);
                         schemaTree.typeMap.put(key, new ListType(new TypeName(s)));
                         schemaTree.inputMap.put(key, new ListType(new TypeName(
                             new GraphQLPropertyConstructor(s).inputKeyWordInQuery())));

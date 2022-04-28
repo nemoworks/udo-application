@@ -18,10 +18,6 @@ import org.springframework.context.annotation.ComponentScan;
 @Slf4j
 public class UdoRestApplication implements CommandLineRunner {
 
-//    public static void main(String[] args) {
-//        SpringApplication.run(UdoRestApplication.class, args);
-//    }
-
     @Autowired
     private HTTPServiceGateway httpServiceGateway;
 
@@ -47,8 +43,6 @@ public class UdoRestApplication implements CommandLineRunner {
         eventBus.register(syncEventHandler);
         eventBus.register(saveByUriEventHandler);
         eventBus.register(subscribeByMqttEventHandler);
-//        httpServiceGateway.register("OfCKE3oBtyoKFg71_rOW", new URI("http://localhost:8999/air"));
-//        httpServiceGateway.register("N_CKE3oBtyoKFg71Q7PL", new URI("http://localhost:8998/airquality"));
     }
 
 

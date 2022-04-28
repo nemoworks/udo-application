@@ -12,12 +12,16 @@ import info.nemoworks.udo.model.event.GatewayEvent;
 import java.io.IOException;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 public class MQTTGateway extends UdoGateway {
 
     private Publisher publisher;
@@ -61,27 +65,27 @@ public class MQTTGateway extends UdoGateway {
     // 向udo发送状态更新请求
     @Override
     public void downLink(String tag, byte[] payload) throws IOException, InterruptedException {
-        System.out.println("downlink topic: " + new String(payload));
+        log.info("downlink topic: " + new String(payload));
         try {
             subscriber.subscribe(new String(payload), (topic, data) -> {
                 data.getPayload();
                 Thread thread = Thread.currentThread();
-                System.out.println(
+                log.info(
                     "MQTT subscribe To Human Service=====" + new String(data.getPayload()));
                 Gson gson = new Gson();
                 try {
                     JsonObject update = gson
                         .fromJson(new String(data.getPayload()), JsonObject.class);
-                    System.out.println("This thread id: " + tag);
-                    System.out.println("Data: " + update.toString());
+                    log.info("This thread id: " + tag);
+                    log.info("Data: " + update.toString());
                     String uri = update.get("uri").getAsString();
-                    System.out.println(
+                    log.info(
                         "Try to update, uri: " + uri);
                     update.remove("uri");
                     this.updateUdoByPolling(tag,
                         gson.toJson(update).getBytes());
                 } catch (Exception e) {
-                    System.out.println("Data is not in the Form of JSON!");
+                    log.info("Data is not in the Form of JSON!");
                 }
 
             });
@@ -126,13 +130,13 @@ public class MQTTGateway extends UdoGateway {
             }
         }
         EventType contextId = gatewayEvent.getContextId();
-        System.out.println("In MQTT Subscribing Udo...");
+        log.info("In MQTT Subscribing Udo...");
         switch (contextId) {
             case SAVE_BY_URI:
                 if (!udo.getUri().getUriType().equals(UriType.MQTT)) {
                     return;
                 }
-                System.out.println("Detect Create Request...");
+                log.info("Detect Create Request...");
                 try {
                     subscriber
                         .subscribe(this.topicRegister, (topic, payload) -> {
@@ -140,15 +144,15 @@ public class MQTTGateway extends UdoGateway {
                             JsonObject content = gson
                                 .fromJson(new String(payload.getPayload()), JsonObject.class);
                             Thread thread = Thread.currentThread();
-                            System.out.println(
+                            log.info(
                                 "MQTT creating UDO=====" + new String(payload.getPayload()));
-                            System.out.println("UdoId: " + udo.getId());
+                            log.info("UdoId: " + udo.getId());
                             try {
                                 String source = content.getAsJsonPrimitive("source").getAsString();
                                 if (!source.equals("backend")) {
                                     JsonObject data = content.get("payload").getAsJsonObject();
-                                    System.out.println("In MQTTGateWay, Creating Udo by URI");
-                                    System.out.println("Data: " + data.toString());
+                                    log.info("In MQTTGateWay, Creating Udo by URI");
+                                    log.info("Data: " + data.toString());
                                     this.updateUdoByUri(udo.getId(), data.toString().getBytes(),
                                         gatewayEvent.getPayload(), udo.getContextInfo(),
                                         udo.getUri().getUriType());
@@ -156,7 +160,7 @@ public class MQTTGateway extends UdoGateway {
                                     this.register(udo.getId(), udo.getUri().getUri());
                                 }
                             } catch (Exception e) {
-                                System.out.println("Data is not in the Form of JSON!");
+                                log.info("Data is not in the Form of JSON!");
                             }
                         });
                 } catch (Exception e) {
@@ -185,7 +189,7 @@ public class MQTTGateway extends UdoGateway {
         throws IOException, InterruptedException {
         if (!endpoints.containsKey(udoi)) {
             endpoints.put(udoi, topic);
-            System.out.println("start subscribers...");
+            log.info("start subscribers...");
             this.start();
         }
     }
@@ -205,8 +209,7 @@ public class MQTTGateway extends UdoGateway {
     public void updateLink(String topic, byte[] payload, String data)
         throws IOException, InterruptedException {
         try {
-            System.out
-                .println(("MQTT publish To Human Resource========" + ":" + new String(data)));
+            log.info(("MQTT publish To Human Resource========" + ":" + new String(data)));
             this.publisher.publish(topic, data.getBytes());
         } catch (MqttException e) {
             e.printStackTrace();

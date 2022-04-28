@@ -24,10 +24,12 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 public class HTTPServiceGateway extends UdoGateway {
 
     private final HttpClient client;
@@ -76,8 +78,8 @@ public class HTTPServiceGateway extends UdoGateway {
 
     public HttpResponse<String> postRequestBody(byte[] payload, String data)
         throws IOException, InterruptedException {
-        System.out.println("Post Payload: " + new String(payload));
-        System.out.println("Data: " + data);
+        log.info("Post Payload: " + new String(payload));
+        log.info("Data: " + data);
         HttpRequest request =
             httpRequestBuilder
                 .POST(HttpRequest.BodyPublishers.ofString(data))
@@ -110,7 +112,6 @@ public class HTTPServiceGateway extends UdoGateway {
                     break;
                 case SAVE:
                     this.register(udo.getId(), new URI(udo.uri.getUri()));
-//                    this.start();
                     break;
                 case UPDATE:
 //                    if (gatewayEvent.getPayload() != null) {
@@ -147,48 +148,23 @@ public class HTTPServiceGateway extends UdoGateway {
 
     public synchronized void register(String tag, URI uri) {
         if (!endpoints.containsKey(tag)) {
-            System.out.println(tag + " registered on httpServiceGateway");
+            log.info(tag + " registered on httpServiceGateway");
             endpoints.put(tag, uri);
         }
     }
 
     public synchronized void unregister(String tag) {
         if (endpoints.containsKey(tag)) {
-            System.out.println(tag + " unregistered on httpServiceGateway");
+            log.info(tag + " unregistered on httpServiceGateway");
             endpoints.remove(tag);
         }
     }
 
     public void start() throws InterruptedException {
-
-//        for(int i = 0;i<5;i++){
-//            endpoints.forEach(
-//                    (key, value) -> {
-//                        try {
-//                            Thread.sleep(30000);
-//                        } catch (InterruptedException e) {
-//                            e.printStackTrace();
-//                        }
-//                        try {
-//                            System.out.println("fetching data...");
-//                            downLink(key, value.toString().getBytes());
-//                        } catch (IOException | InterruptedException e) {
-//                            // TODO Auto-generated catch block
-//                            e.printStackTrace();
-//                        }
-//
-//                    });
-//        }
-//
-//        ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-//
-//        executor.scheduleWithFixedDelay(
-//            () -> {
-//                try {
         endpoints.forEach(
             (key, value) -> {
                 try {
-                    System.out.println("fetching data...");
+                    log.info("fetching data...");
                     downLink(key, value.toString().getBytes());
                     TimeUnit.SECONDS.sleep(10);
                 } catch (Exception e) {
@@ -196,17 +172,6 @@ public class HTTPServiceGateway extends UdoGateway {
                     e.printStackTrace();
                 }
             });
-
-//                } catch (Exception ex) {
-//                    throw new RuntimeException(ex);
-//                }
-//            },
-//            15,
-//            15,
-//            TimeUnit.SECONDS);
-//        TimeUnit.SECONDS.sleep(15);
-//
-//        executor.shutdown();
     }
 
     // downlink: 获取资源状态，向udo发送状态更新消息
@@ -217,11 +182,10 @@ public class HTTPServiceGateway extends UdoGateway {
                 .GET()
                 .uri(URI.create(new String(payload)))
                 .header("Authorization",
-                    "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlNmU2NzdhM2ZmMmU0YjM1YTg0YmNlN2Y3ZDU5YTEwMiIsImlhdCI6MTYzNTQ4ODg3NywiZXhwIjoxOTUwODQ4ODc3fQ.4QXAKdRe2xXP27aWuifQ-ROD3fCo6iI2n7mU_Qef7hI")
+                    "Bearer "+bearerToken)
                 .build();
 
         HttpResponse<String> body = client.send(request, BodyHandlers.ofString());
-
         this.updateUdoByPolling(tag, body.body().getBytes());
     }
 
@@ -232,13 +196,12 @@ public class HTTPServiceGateway extends UdoGateway {
         HttpRequest request = httpRequestBuilder.POST(HttpRequest.BodyPublishers.ofString(data))
             .uri(URI.create(new String(payload)))
             .header("Authorization",
-                "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlNmU2NzdhM2ZmMmU0YjM1YTg0YmNlN2Y3ZDU5YTEwMiIsImlhdCI6MTYzNTQ4ODg3NywiZXhwIjoxOTUwODQ4ODc3fQ.4QXAKdRe2xXP27aWuifQ-ROD3fCo6iI2n7mU_Qef7hI")
+                "Bearer "+bearerToken)
             .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-//        System.out.println(response.statusCode());
+//        log.info(response.statusCode());
         // print response body
-//        System.out.println(response.body());
+//        log.info(response.body());
 
     }
 

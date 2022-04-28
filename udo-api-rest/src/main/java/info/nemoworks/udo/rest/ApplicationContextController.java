@@ -18,6 +18,7 @@ import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,12 +46,13 @@ public class ApplicationContextController {
     @Autowired
     MQTTGateway mqttGateway;
 
+    private final String mqttHost = "tcp://47.94.101.110:8081";
 
     @PostMapping("/applicationContext")
     public String createApplicationContext(@RequestParam String id)
         throws MqttException, IOException {
         String clientid1 = UUID.randomUUID().toString();
-        MqttClient client1 = new MqttClient("tcp://210.28.132.168:30609", clientid1);
+        MqttClient client1 = new MqttClient(mqttHost, clientid1);
         MqttConnectOptions options = new MqttConnectOptions();
         options.setUserName("udo-user");
         char[] password = "123456".toCharArray();
@@ -63,14 +65,14 @@ public class ApplicationContextController {
         Publisher httpPublisher = new Publisher(client1);
 
         String clientid2 = UUID.randomUUID().toString();
-        MqttClient client2 = new MqttClient("tcp://210.28.132.168:30609", clientid2);
+        MqttClient client2 = new MqttClient(mqttHost, clientid2);
         client2.connect(options);
         Subscriber httpSubscriber = new Subscriber(client2);
 
         String clientid3 = UUID.randomUUID().toString();
-        MqttClient client3 = new MqttClient("tcp://210.28.132.168:30609", clientid3);
+        MqttClient client3 = new MqttClient(mqttHost, clientid3);
         String clientid4 = UUID.randomUUID().toString();
-        MqttClient client4 = new MqttClient("tcp://210.28.132.168:30609", clientid4);
+        MqttClient client4 = new MqttClient(mqttHost, clientid4);
 
         client3.connect(options);
         client4.connect(options);
