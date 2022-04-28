@@ -23,6 +23,8 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -34,6 +36,11 @@ public class HTTPServiceGateway extends UdoGateway {
             .header("Content-Type", "application/json")
             .timeout(Duration.ofMinutes(2));
 
+    @Value("${httpGateway.bearer.token}")
+    private String bearerToken;
+
+    @Value("${homeassistant.host}")
+    private String homeAssistantHost;
 
     public ConcurrentHashMap<String, URI> getEndpoints() {
         return endpoints;
@@ -61,7 +68,7 @@ public class HTTPServiceGateway extends UdoGateway {
                 .uri(URI.create(new String(payload)))
                 .header("Referer", "postman")
                 .header("Authorization",
-                    "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlNmU2NzdhM2ZmMmU0YjM1YTg0YmNlN2Y3ZDU5YTEwMiIsImlhdCI6MTYzNTQ4ODg3NywiZXhwIjoxOTUwODQ4ODc3fQ.4QXAKdRe2xXP27aWuifQ-ROD3fCo6iI2n7mU_Qef7hI")
+                    "Bearer "+bearerToken)
                 .build();
 
         return client.send(request, BodyHandlers.ofString());
@@ -76,7 +83,7 @@ public class HTTPServiceGateway extends UdoGateway {
                 .POST(HttpRequest.BodyPublishers.ofString(data))
                 .uri(URI.create(new String(payload)))
                 .header("Authorization",
-                    "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlNmU2NzdhM2ZmMmU0YjM1YTg0YmNlN2Y3ZDU5YTEwMiIsImlhdCI6MTYzNTQ4ODg3NywiZXhwIjoxOTUwODQ4ODc3fQ.4QXAKdRe2xXP27aWuifQ-ROD3fCo6iI2n7mU_Qef7hI")
+                    "Bearer "+bearerToken)
                 .build();
 
         return client.send(request, BodyHandlers.ofString());
@@ -117,11 +124,11 @@ public class HTTPServiceGateway extends UdoGateway {
                         String postBody = new Gson().toJson(entityId);
                         if (data.get("state").getAsString().equals("off")) {
                             this.postRequestBody(
-                                "http://192.168.80.138:8122/api/services/fan/turn_off".getBytes(),
+                                    (homeAssistantHost+"/api/services/fan/turn_off").getBytes(),
                                 postBody);
                         } else {
                             this.postRequestBody(
-                                "http://192.168.80.138:8122/api/services/fan/turn_on".getBytes(),
+                                    (homeAssistantHost+"/api/services/fan/turn_on").getBytes(),
                                 postBody);
                         }
                     }
