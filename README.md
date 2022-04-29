@@ -8,7 +8,7 @@ IOS端：https://github.com/nemoworks/udo-iosapp
 
 系统演示：https://www.bilibili.com/video/BV1yq4y1H7wx?share_source=copy_web
 
-详情见[架构说明](docs/架构说明.md)和[部署说明](docs/部署说明.md)。
+建议先观看系统演示视频，详情见[架构说明](docs/架构说明.md)和[部署说明](docs/部署说明.md)。
 
 ## 演示示例
 ![](docs/images/UDO.png)
